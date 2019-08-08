@@ -85,13 +85,4 @@ export default {
     color: #ffffff;
   }
 </style>
-function buildGetEntityRequest(sender, type) {
-  return {
-    MessageID: guid(),
-    Sender: sender,
-    GetEntity: {
-      Type: type,
-      Commit: 0
-    }
-  }
-}
+
