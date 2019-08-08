@@ -2,29 +2,64 @@
   <!-- template里只能有一个根节点 -->
   <div class="demo-page">
     <text class="title">欢迎打开{{title}}</text>
-    <input class="btn" type="button" value="mqttConnect" onclick="mqttConnect" />
+    <input class="btn" type="button" value="pahoMqtt" onclick="pahoMqtt" />
   </div>
 </template>
 
 
 <script>
+
 import router from '@system.router'
-import mqtt from '../../node_modules/mqtt/dist/mqtt.js'
+import mqtt from '../mqtt/paho.js'
+
 export default {
   // 页面级组件的数据模型，影响传入数据的覆盖机制：private内定义的属性不允许被覆盖
   private: {
     title: '示例页面'
   },
-  mqttConnect () {
-    console.log(mqtt, '进入');
-      var client = mqtt.connect('ws://test.mosquitto.org:8080/mqtt')
-      client.on('connect',function() {
-        console.log('成功连接')
-      })
-      client.on('error',function(){
-        console.log('连接失败')
-      })
+  onReady () {
+    console.log('进入onReady')
+     //broker.hivemq.com 8000
+  },
+  
+  pahoMqtt () {
+    console.log('进入事件处理函数');
+      var connected = false;
+      var client = new mqtt.Client('ws://192.168.2.234:80/ws/mqtt/json','abc888888');
+      //console.log(client);
+      client.onConnectionLost = function (responseObject) {
+        connected = false;
+        if (responseObject.errorCode !== 0)
+        console.log("onConnectionLost:"+responseObject.errorMessage);
+      }
+      client.onMessageArrived = function (message) {
+        console.log("onMessageArrived:"+message.payloadString);
+        //client.disconnect();
+      }
+
+      client.connect({
+        userName:'yangzhengrong',
+        password:'123456',
+        onSuccess:function (msg) {
+            connected = true;
+            console.log('连接成功',msg)
+            client.subscribe('message/yangzhengrong',{ qos: Number(0) });
+            console.log('subscribe之后')
+            var message = new mqtt.Message("Hello");
+            message.qos = Number(0)
+            message.destinationName = "message/box-98-5d-ad-be-a1-17";
+            client.send(JSON.stringify(message));
+        },
+        onFailure: function (e) {
+                connected = false;
+                console.log(e);
+
+            }
+      });
+
+     
   }
+
 }
 </script>
 
@@ -50,3 +85,13 @@ export default {
     color: #ffffff;
   }
 </style>
+function buildGetEntityRequest(sender, type) {
+  return {
+    MessageID: guid(),
+    Sender: sender,
+    GetEntity: {
+      Type: type,
+      Commit: 0
+    }
+  }
+}

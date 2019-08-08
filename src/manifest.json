@@ -8,13 +8,15 @@
   "features": [
     { "name": "system.prompt" },
     { "name": "system.router" },
-    { "name": "system.shortcut" }
+    { "name": "system.shortcut" },
+    { "name": "system.websocketfactory" },
+    { "name": "system.storage" }
   ],
   "permissions": [
     { "origin": "*" }
   ],
   "config": {
-    "logLevel": "off"
+    "logLevel": "debug"
   },
   "router": {
     "entry": "Demo",
